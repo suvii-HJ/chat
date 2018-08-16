@@ -1,41 +1,43 @@
 <?php
-	$ws = new swoole_websocket_server('127.0.0.1',9505);
-
-	// $redis = new Redis();
- // 	$red = $redis->connect('127.0.0.1',6379);
-	// if($red){
- // 		echo 'redis服务器 连接成功! ----';
- // 	}else{
- // 		echo 'redis服务器 连接失败！----n';
- // 	}
+	$ws = new swoole_websocket_server('132.232.68.97',9505);
+    // $ws = new swoole_websocket_server('127.0.0.1',9505);
 
 
 	$ws->on('open', function ($ws, $request) {  
-        echo '--------------------***************-';
     	var_dump('websocket连接成功--> $request->fd\n');
     	   
+        $nowFd = $request->fd;   
         $userName = $request->get['name'];
-        $userId = $userName.$request->fd;
+        $userId = $userName.$nowFd;
         
     	$res = [
     		'is_god' => true,
     		'name' => $userName,
     		'msg' => "Hi,$userName,欢迎使用suvii简易聊天工具"
     	];
-    	$ws->push($request->fd, json_encode($res,256));
+    	$ws->push($nowFd, json_encode($res,256));
+
+        foreach ($ws->connections as $fd) {
+            if($fd != $nowFd){
+                $tip = [
+                    'is_god' => true,
+                    'name' => $userName,
+                    'msg' => $userName." 上线！"
+                ];
+                $ws->push($fd, json_encode($tip,256));
+            }
+        }
+
 	});
 
 	$ws->on('message', function ($ws, $frame) {
     	echo "Message: ".$frame->data.'\n';
     	var_dump('frame'.json_encode($frame,256));
-    	echo '--------************------------';
 
     	$curFd = $frame->fd;
     	$data = $frame->data;
     	$data = json_decode(trim($data),true);
 
-   //  	$name = $redis->hMget('user',['name','lover','age']);
- 		// var_dump('redis缓存：：：：'.json_encode($name,256));
 
 		$return = [
     		'name' => $data['name'],
@@ -55,7 +57,16 @@
     });
 
 	$ws->on('close', function ($ws, $fd) {
-        echo '--------------------***************-';
+        // foreach ($ws->connections as $con) {
+        //     if($con != $fd){
+        //         $tip = [
+        //             'is_god' => true,
+        //             'name' => $userName,
+        //             'msg' => $userName." 下线！"
+        //         ];
+        //         $ws->push($con, json_encode($tip,256));
+        //     }
+        // }
     	echo "客户端--".$fd.": 关闭了.\n";
 	});
 
