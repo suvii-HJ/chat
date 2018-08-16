@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>简易聊天室</title>
+	<meta charset="utf-8">
+	<script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+	<style type="text/css">
+		.sys_msg{
+			font-size: 10px;
+		    color: #8e8989;
+		    width: 33%;
+		    margin: 2rem auto;
+		    height: 1rem;
+		    max-width: 18rem;
+		}
+		.chat_name{
+			display: flex;
+			color: #82817d;
+			margin-bottom: 5px;
+    		line-height: 35px;
+		}
+		.chat_self {
+			float: right;
+		}
+		.chat_other{
+			float: left;
+		}
+
+		.chat_content{
+		    width: auto;
+		    padding: 10px;
+		    display: block;
+		    border-radius: 20px;
+		    max-width: 20rem;
+		}
+		.chat_self .chat_content{
+			background: #10bd4b;
+		    color: white;
+		}
+		.chat_other .chat_content{
+			background: white;
+		    color: #565151;
+		}
+		.chat_line{
+			display: block;
+			overflow: hidden;
+		}
+
+		.chat_room{
+			overflow: hidden;
+			overflow-y: scroll;
+			background: #dad9e0;
+		    margin: 2rem auto;
+		    width: 70%;
+		    padding: 1.5rem 3rem;
+		    border-radius: 18px;
+		    height: 500px;
+		}
+
+		.info{
+			margin: 0 auto;
+		    background: #eeedf3;
+		    width: 50%;
+		    border-radius: 16px;
+		    padding: 2rem;
+		    color: #6b6b6b;
+		}
+		.title{
+			margin: 3rem auto;
+		    width: 200px;
+		    color: #50524d;
+		    font-size: 28px;
+		    background-color: #f3b70e;
+		    border-radius: 12px;
+		    padding-left: 3rem;
+		    box-shadow: 1px 7px 31px;
+		}
+
+		#submit{
+			border: none;
+		    padding: 6px 10px;
+		    border-radius: 10px;
+		    background-color: #0acc10;
+		    color: white;
+		    margin-left: 4rem;
+		    width: 9rem;
+		    letter-spacing: 12px;
+		    height: 2.5rem;
+		}
+		img{
+			width: 2.5rem;
+		    height: 2.5rem;
+		    border-radius: 24px;
+		    margin-right: 5px;
+		}
+	</style>
+</head>
+<body>
+
+	<div class="title">简易聊天室</div>
+	<div class="chat_room" id="chat_room">
+		<!-- <div class="chat_line">
+			<p class="chat_other">
+				<span class="chat_name"><img src="./ll.jpg">客服小姐姐:</span>
+				<span class="chat_content">什么是真实，做什么和谁在一起，你看到什么听到什么，有一种从心灵深处满溢出来的不懊悔也不羞耻的平和与喜悦。</span>
+			</p>
+		</div>
+
+		<div class="chat_line">
+			<p class="chat_self">
+				<span class="chat_name"><img src="./bb.jpg">子胥:</span>
+				<span class="chat_content">把自己交给繁忙，得到的是踏实，却不是真实</span>
+			</p>
+		</div>
+
+		<div class="chat_line">
+			<p class="chat_other">
+				<span class="chat_name"><img src="./ll.jpg">客服小姐姐:</span>
+				<span class="chat_content">不要放弃对自己的探索，对自己的真实</span>
+			</p>
+		</div>
+
+		-->
+		
+	</div>
+
+	<div class="info">
+		<label>名字：<span class="name"></span></label>
+		<label><p>内容：</p><textarea rows="5" style="margin-left: 3rem;border-width: 0;border-radius: 10px;padding: .5rem .5rem;"></textarea></label>
+
+		<button id="submit">发送</button>
+	</div>
+
+
+</body>
+
+<script>
+	var chat_room_obj = document.getElementById('chat_room');
+
+	var userName = '';
+	userName = localStorage.getItem("suv_name");
+
+	$(function () {
+		if(!userName){
+			window.location.href = '/chat/login.html'
+		}
+		$('.name').html(userName)
+	})
+
+
+	var wsServer = 'ws://127.0.0.1:9502/?name='+userName;
+	var websocket = new WebSocket(wsServer);
+
+	websocket.onopen = function (evt) {
+	    console.log("连接到 WebSocket 服务.");
+	};
+
+	websocket.onclose = function (evt) {
+
+	    console.log("websocket 连接断开");
+	};
+
+	websocket.onmessage = function (evt) {
+		var data = JSON.parse(evt.data);
+		var name = data['name'];
+		var msg  = data['msg'];
+
+
+		if(data['is_god']){
+			systemMsgShow(data['msg']);
+		}else{
+			otherMsgShow(data['name'],data['msg']);
+		}
+		
+	    console.log('从服务器接收信息: ' + evt.data);
+	};
+
+
+
+	websocket.onerror = function (evt, e) {
+		systemMsgShow(evt.data)
+	    console.log('错误发生: ' + evt.data);
+	};
+
+
+	$('#submit').on('click',send)
+
+	function send(){
+		var msg = $('textarea').val();
+		var data = {
+			'name':userName,
+			'msg':msg
+		};
+		data = JSON.stringify(data);
+		
+		var msg_right = '<div class="chat_line">'+
+					'<p class="chat_self">'+
+					'<span class="chat_name"><img src="./bb.jpg">'+userName+':</span>'+
+					'<span class="chat_content">'+msg+'</span>'+
+					'</p>'+
+					'</div>';			
+					
+		$('.chat_room').append(msg_right);
+		var obj = document.getElementById('chat_room');
+		obj.scrollTop = obj.scrollHeight;
+
+		try{
+          websocket.send(data);
+        }catch(ex){
+          console.log(ex);
+        }
+	}
+
+	/**
+	 * 系统消息接收
+	 * @param  {[type]} data [description]
+	 * @return {[type]}      [description]
+	 */
+	function systemMsgShow(data){
+		msg = '<div class="sys_msg">'+data+'</div>'
+		$('.chat_room').append(msg);
+		chat_room_obj.scrollTop = chat_room_obj.scrollHeight;
+	}
+
+	/**
+	 * 他人消息接收
+	 * @return {[type]} [description]
+	 */
+	function otherMsgShow(name,msg){
+		var msg_left = '<div class="chat_line">'+
+					'<p class="chat_other">'+
+					'<span class="chat_name"><img src="./ll.jpg">'+name+':</span>'+
+					'<span class="chat_content">'+msg+'</span>'+
+					'</p>'+
+					'</div>';
+		$('.chat_room').append(msg_left);
+		chat_room_obj.scrollTop = chat_room_obj.scrollHeight;
+	}
+
+</script>
+</html>

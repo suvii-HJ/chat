@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>访问登录</title>
+	<meta charset="utf-8">
+	<script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+	
+
+	<style type="text/css">
+		.login{
+			width: 30rem;
+		    background: radial-gradient(#d2d0d0,#abd4b3,#43ab54,#168e14);
+		    margin: 18rem auto;
+		    border-radius: 216px;
+		    height: 24rem;
+		    box-shadow: 5px 6px 30px 20px #b9d8ab;
+		}
+		input{
+			border-radius: 10px;
+		    border-width: 0;
+		    display: inline;
+		    margin: 9rem 9.3rem 4rem;
+		    height: 3rem;
+		    font-size: 17px;
+		    color: #696664;
+		     padding: 0 10px;
+		}
+		p{
+			margin: 2rem auto;
+		    width: 6rem;
+		    color: white;
+		    font-size: 22px;
+		}
+		.joinChat{
+			border-radius: 10px;
+		    margin: 0 auto;
+		    width: 6rem;
+		    display: block;
+		    background-color: #3b8053;
+		    color: white;
+		    height: 2.8rem;
+		    font-size: 15px;
+		    border-width: 0;
+		}
+	</style>
+</head>
+<body>
+	<div class="login">
+		<input type="text" name="name" placeholder="请输入聊天时的昵称...">
+		<button class="joinChat">进入聊天室</button>
+	</div>
+
+	<script >
+		$('.joinChat').click(function(){
+			var name = $('input[name=name]').val();
+			if(name === ''){
+				alert('请输入聊天时的昵称')
+			}else{
+				localStorage.setItem("suv_name", name);
+				window.location.href = '/chat/client.html'
+			}
+
+		})
+
+		$(function(){
+			if (typeof(Storage) == "undefined") {
+			    $('.login').html('抱歉！您的浏览器不支持 Web Storage ,建议使用最新版的Chrome浏览器');
+			} 
+		})
+
+	</script>
+</body>
+</html>
