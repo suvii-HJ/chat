@@ -1,5 +1,5 @@
 <?php
-	$ws = new swoole_websocket_server('0.0.0.0',9502);
+	$ws = new swoole_websocket_server('127.0.0.1',9505);
 
 	// $redis = new Redis();
  // 	$red = $redis->connect('127.0.0.1',6379);
