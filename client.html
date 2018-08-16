@@ -150,6 +150,7 @@
 
 	var wsServer = 'ws://127.0.0.1:9502/?name='+userName;
 	var websocket = new WebSocket(wsServer);
+	console.log(websocket);
 
 	websocket.onopen = function (evt) {
 	    console.log("连接到 WebSocket 服务.");
@@ -179,13 +180,12 @@
 
 	websocket.onerror = function (evt, e) {
 		systemMsgShow(evt.data)
-	    console.log('错误发生: ' + evt.data);
+	    console.log('错误发生: ' + '---');
+	    console.log(evt);
 	};
 
 
-	$('#submit').on('click',send)
-
-	function send(){
+	$('#submit').on('click',function(){
 		var msg = $('textarea').val();
 		var data = {
 			'name':userName,
@@ -203,13 +203,15 @@
 		$('.chat_room').append(msg_right);
 		var obj = document.getElementById('chat_room');
 		obj.scrollTop = obj.scrollHeight;
-
+			
 		try{
           websocket.send(data);
         }catch(ex){
           console.log(ex);
         }
-	}
+	})
+
+
 
 	/**
 	 * 系统消息接收
