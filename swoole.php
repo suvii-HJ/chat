@@ -1,7 +1,6 @@
 <?php
-	// $ws = new swoole_websocket_server('132.232.68.97',9505);
-    // $ws = new swoole_websocket_server('127.0.0.1',9505);
-    $ws = new swoole_websocket_server('192.168.200.80',9505);
+    $ws = new swoole_websocket_server('0.0.0.1',9505);
+    // $ws = new swoole_websocket_server('192.168.200.80',9505);
 
 
 	$ws->on('open', function ($ws, $request) {  

@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>简易聊天室</title>
+	<title>简易多人聊天室</title>
 	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
 	<script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 	<style type="text/css">
 		.sys_msg{
@@ -51,29 +53,30 @@
 			overflow-y: scroll;
 			background: #dad9e0;
 		    margin: 2rem auto;
-		    width: 70%;
+		    width: 50%;
 		    padding: 1.5rem 3rem;
 		    border-radius: 18px;
-		    height: 500px;
+		    height: 30rem;
 		}
 
 		.info{
-			margin: 0 auto;
+			margin: 0 21rem;
 		    background: #eeedf3;
-		    width: 50%;
+		    width: 33%;
 		    border-radius: 16px;
 		    padding: 2rem;
 		    color: #6b6b6b;
 		}
 		.title{
-			margin: 3rem auto;
-		    width: 200px;
+			    margin: 9rem 0rem 0 4rem;
+		    width: 2rem;
 		    color: #50524d;
-		    font-size: 28px;
+		    font-size: 1.7rem;
 		    background-color: #f3b70e;
 		    border-radius: 12px;
-		    padding-left: 3rem;
+		    padding: 1rem 1rem;
 		    box-shadow: 1px 7px 31px;
+		    float: left;
 		}
 
 		#submit{
@@ -99,30 +102,9 @@
 
 	<div class="title">简易聊天室</div>
 	<div class="chat_room" id="chat_room">
-		<!-- <div class="chat_line">
-			<p class="chat_other">
-				<span class="chat_name"><img src="./ll.jpg">客服小姐姐:</span>
-				<span class="chat_content">什么是真实，做什么和谁在一起，你看到什么听到什么，有一种从心灵深处满溢出来的不懊悔也不羞耻的平和与喜悦。</span>
-			</p>
-		</div>
-
-		<div class="chat_line">
-			<p class="chat_self">
-				<span class="chat_name"><img src="./bb.jpg">子胥:</span>
-				<span class="chat_content">把自己交给繁忙，得到的是踏实，却不是真实</span>
-			</p>
-		</div>
-
-		<div class="chat_line">
-			<p class="chat_other">
-				<span class="chat_name"><img src="./ll.jpg">客服小姐姐:</span>
-				<span class="chat_content">不要放弃对自己的探索，对自己的真实</span>
-			</p>
-		</div>
-
-		-->
 		
 	</div>
+
 
 	<div class="info">
 		<label>名字：<span class="name"></span></label>
@@ -149,8 +131,8 @@
 
 
 	// var wsServer = 'ws://132.232.68.97:9505/?name='+userName;
-	// var wsServer = 'ws://127.0.0.1:9505/?name='+userName;
-	var wsServer = 'ws://192.168.200.80:9505/?name='+userName;
+	var wsServer = 'ws://127.0.0.1:9505/?name='+userName;
+	// var wsServer = 'ws://192.168.200.80:9505/?name='+userName;
 
 	var websocket = new WebSocket(wsServer);
 	console.log(websocket);
@@ -186,9 +168,17 @@
 	    console.log('错误发生: ' + '---');
 	    console.log(evt);
 	};
+	$('textarea').bind('keyup',function(e){
+		  if (e.keyCode == 13) {
+		    sendMsg();
+		  }
+	})
 
+	$('#submit').on('click',sendMsg);
+	
 
-	$('#submit').on('click',function(){
+	//发送消息
+	function sendMsg(){
 		var msg = $('textarea').val();
 		var data = {
 			'name':userName,
@@ -209,10 +199,11 @@
 			
 		try{
           websocket.send(data);
+          $('textarea').val('');
         }catch(ex){
           console.log(ex);
         }
-	})
+	}
 
 
 
