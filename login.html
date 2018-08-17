@@ -51,7 +51,7 @@
 	</div>
 
 	<script >
-		$('.joinChat').click(function(){
+		function enter(){
 			var name = $('input[name=name]').val();
 			if(name === ''){
 				alert('请输入聊天时的昵称')
@@ -59,8 +59,14 @@
 				localStorage.setItem("suv_name", name);
 				window.location.href = '/client.html'
 			}
-
+		}
+		$('input[name=name]').bind('keyup',function(e){
+			if(e.keyCode === 13){
+				enter();
+			}
 		})
+		$('.joinChat').on('click',enter)
+		
 
 		$(function(){
 			if (typeof(Storage) == "undefined") {
